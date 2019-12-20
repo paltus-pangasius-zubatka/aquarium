@@ -1,0 +1,126 @@
+<html>
+<head>
+<title>Moving ball</title>
+ <style type="text/css">
+ 	* {
+ 		margin: 0;
+ 		position: absolute;
+ 		left: 0;
+ 		top: 0;
+ 		right: 0; 
+ 		bottom: 0;
+ 		overflow: hidden;
+ 		font-size: 30px;
+ 	}
+ </style>
+</head>
+
+<body>
+
+	<div id="ball"> * </div>
+
+
+<script>
+
+	var heading; // = null
+	var goLeft = 0;
+	var goUp = 0;
+	var flag = 0;
+	var myWidth;
+	var myHeight;	
+	
+let round = function(){ // генератор случайных чисел, чем больше число тем больше угол движения объекта и скорость
+    let randomNumer = (Math.round(Math.random() * 4)) + 1;
+    return randomNumer;
+};
+
+	var RND1 = round(); //стартовые значения увеличивающие координаты
+	var RND2 = round();
+
+let moveBall = function (){  //основная функция
+
+				myWidth = window.innerWidth - 15; //получаем размер окна
+    			myHeight = window.innerHeight - 25;		
+
+				if(flag == 0){  // флаг направления движения
+					goLeft = goLeft + RND1;  //увеличиваем координаты для ball
+				 	goUp = goUp + RND2;
+	
+					heading = document.getElementById("ball"); //берем элемент ball и рисуем в координатах goLeft, goUp
+					heading.style.left = goLeft;
+					heading.style.top = goUp;
+					
+							if (goLeft >= myWidth){
+								flag = 3;  // флаг смены движения, переход к else if ниже
+									RND1 = round(); //задаем новые параметры приращения смещения для нового направления
+									RND2 = round();
+							}
+							else if (goUp >= myHeight){
+								flag = 2;  // флаг смены движения, переход к else if ниже
+									RND1 = round(); //задаем новые параметры приращения смещения для нового направления
+									RND2 = round();
+							}
+				 }
+				 else if (flag == 1){
+				 	goLeft = goLeft - RND1;  //уменьшаем координаты для ball
+				 	goUp = goUp - RND2;
+					heading = document.getElementById("ball");
+					heading.style.left = goLeft;
+					heading.style.top = goUp;
+					
+							if (goLeft <= 0){
+								flag = 2;	
+									RND1 = round();
+									RND2 = round();
+							}
+							else if (goUp <=0){
+								flag = 3;	
+									RND1 = round();
+									RND2 = round();
+							}
+				}
+				else if (flag == 2){
+				 	goLeft = goLeft + RND1;  //увеличиваем или уменьшаем координаты  для ball
+				 	goUp = goUp - RND2;
+				 	heading = document.getElementById("ball");
+					heading.style.left = goLeft;
+					heading.style.top = goUp;
+					
+							if (goLeft >= myWidth){
+								flag = 1;	
+									RND1 = round();
+									RND2 = round();
+							}
+							else if (goUp <=0){
+								flag = 0;	
+									RND1 = round();
+									RND2 = round();
+							}
+				}
+				else if (flag == 3){
+				 	goLeft = goLeft - RND1;  //увеличиваем или уменьшаем координаты  для ball
+				 	goUp = goUp + RND2;
+					heading = document.getElementById("ball");
+					heading.style.left = goLeft;
+					heading.style.top = goUp;
+					
+							if (goLeft <= 0){
+								flag = 0;	
+									RND1 = round();
+									RND2 = round();
+							}
+							else if (goUp >= myHeight){
+								flag = 1;	
+									RND1 = round();
+									RND2 = round();
+							}
+				}
+}
+
+
+setInterval(moveBall, 10);			//запускаем функцию  moveHeading с интервалом 10 миллисекунд
+
+	
+</script>
+</body>
+</html>
