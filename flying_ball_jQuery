@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html> <!-- lang="ru"> -->
+ 	<head>
+  		<title>Flying Ball</title>
+  		<meta charset="utf-8">
+  		<style>
+		   html { overflow:  hidden;
+				position: absolute; }
+  		</style>
+ 	</head>
+<body>
+	<h1 id="heading"> * </h1>
+
+		<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+		<script>
+				
+			let flag = 0; // 0 - движение вправо вниз, 1 - движение влево вверх 
+
+			let goLeft = 0; //начальная позиция, в дальнейшем к ней добавляется приращение.
+			let goUp = 0; 
+
+			let RND1 = 1; // стартовое значение для генератора случайных чисел
+			let RND2 = 1;
+
+			let myWidth = 500; //размер окна по горизонтали
+    		let myHeight = 300; //размер окна по вертикали
+
+let round = function(){ // генератор случайных чисел, чем больше число тем больше угол движения объекта и скорость
+    let randomNumer = (Math.floor(Math.random() * 4)) + 1;
+    return randomNumer;
+};
+
+let moveHeading = function (){  //основная функция
+				
+	if(flag == 0){  // флаг направления движения
+		goLeft = goLeft + RND1;  //начинаем увеличивать координату goLeft (перемещение по горизонтали)
+		goUp = goUp + RND2;		//начинаем увеличивать координату goUp (перемещение по вертикали)
+		$('#heading').offset({ left: goLeft, top: goUp}); //строку из heading рисуем со смещением на goLeft и goRight пикселей			
+						
+			if (goLeft >= myWidth){
+				flag = 3;  // флаг смены движения, переход к else if ниже
+					RND1 = round(); //задаем новые параметры приращения смещения
+					RND2 = round();
+			}
+			else if (goUp >= myHeight){
+				flag = 2;  // флаг смены движения, переход к else if ниже
+					RND1 = round(); //задаем новые параметры приращения смещения
+					RND2 = round();
+			}		
+	}
+
+	else if (flag == 1){
+		goLeft = goLeft - RND1;  //начинаем уменьшать координату goLeft (перемещение по горизонтали)
+		goUp = goUp - RND2;		//начинаем уменьшать координату goUp (перемещение по вертикали)
+		$('#heading').offset({ left: goLeft, top: goUp});			
+						
+			if (goLeft <= 0){
+				flag = 2;	
+					RND1 = round();
+					RND2 = round();
+			}
+			else if (goUp <=0){
+				flag = 3;	
+					RND1 = round();
+					RND2 = round();
+			}
+				 		
+	}
+
+	else if (flag == 2){
+		goLeft = goLeft + RND1;  //начинаем увеличивать координату goLeft (перемещение по горизонтали)
+		goUp = goUp - RND2; 	//начинаем уменьшать координату goUp (перемещение по вертикали)
+		$('#heading').offset({ left: goLeft, top: goUp});			
+						
+			if (goLeft >= myWidth){
+				flag = 1;	
+					RND1 = round();
+					RND2 = round();
+			}
+			else if (goUp <=0){
+				flag = 0;	
+					RND1 = round();
+					RND2 = round();
+			}
+				 		
+	}
+	else if (flag == 3){
+		goLeft = goLeft - RND1;  //начинаем уменьшать координату goLeft (перемещение по горизонтали)
+		goUp = goUp + RND2;	 //начинаем увеличивать координату goUp (перемещение по вертикали)
+		$('#heading').offset({ left: goLeft, top: goUp});
+						
+			if (goLeft <= 0){
+				flag = 0;	
+					RND1 = round();
+					RND2 = round();
+			}
+			else if (goUp >= myHeight){
+				flag = 1;	
+					RND1 = round();
+					RND2 = round();
+			}
+				 		
+	}
+
+};
+
+setInterval(moveHeading, 5);			//запускаем функцию  moveHeading с интервалом 5 миллисекунд
+			
+		</script>
+	</body>
+</html>
