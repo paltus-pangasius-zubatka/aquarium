@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html> <!-- lang="ru"> -->
+ <head>
+  <title>Летающий шарик. Диагональная версия</title>
+  <meta charset="utf-8">
+  <style>
+   html { overflow:  hidden; }
+  </style>
+ </head>
+	<body>
+		<h1 id="heading"> hELLOW aLL! </h1>
+		<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+		
+		<script>
+			
+			let flag = 0; // 0 - движение вправо вниз, 1 - движение влево вверх 
+
+			let goLeft = 0; //начальная позиция, в дальнейшем к ней добавляется приращение.
+			let goUp = 0; 
+
+			let RND1 = 1; // стартовое значение для генератора случайных чисел
+			let RND2 = 1;
+
+
+			let myWidth = 500; //размер ограничивающего прямоугольника в окне браузера
+    		let myHeight = 300;
+
+			let round = function(){ // генератор случайных чисел, чем больше число тем больше угол движения объекта и скорость
+    				let randomNumer = (Math.floor(Math.random() * 4)) + 1;
+   					 return randomNumer;
+			};
+
+			let moveHeading = function (){  //основная функция
+				
+				if(flag == 0){  // флаг направления движения
+					goLeft = goLeft + RND1;  //добавляем приращение к текущему положению строки heading
+				 	goUp = goUp + RND2;
+					$('#heading').offset({ left: goLeft, top: goUp}); //строку из heading рисуем со смещением на goLeft и goRight пикселей
+					//$('#heading').text(goLeft + ' ' + goUp + ' ' + RND1 + ' ' + RND2 ); //если раскомментировать, выведет координаты и значение случайного приращения
+					$('#heading').text('*');
+					
+						if (goLeft >= myWidth || goUp >= myHeight){  //если достигли границы экрана - меняем направление движения
+				 		flag = 1;  // флаг смены движения, переход к else if ниже
+				 		RND1 = round(); //задаем новые параметры приращения смещения
+						RND2 = round();
+				 		}
+				 }
+				 else if (flag == 1){
+				 	goLeft = goLeft - RND1;  //добавляем уменьшение к текущему положению строки heading
+				 	goUp = goUp - RND2;
+				 	$('#heading').offset({ left: goLeft, top: goUp});
+					//$('#heading').text(goLeft + ' ' + goUp + ' ' + RND1 + ' ' + RND2 );
+					$('#heading').text('*');
+					
+						if (goLeft <= 0 || goUp <= 0){
+				 		flag = 0;	
+				 		RND1 = round();
+						RND2 = round();
+				 		}
+				}
+
+			};
+
+setInterval(moveHeading, 5);			//запускаем функцию  moveHeading с интервалом 5 миллисекунд
+			
+		</script>
+	</body>
+</html>
