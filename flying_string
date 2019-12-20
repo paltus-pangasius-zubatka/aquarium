@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html> <!-- lang="ru"> -->
+ <head>
+  <title>Анимация строки</title>
+  <meta charset="utf-8">
+ </head>
+	<body>
+		<h1 id="heading"> Привет! </h1>
+		<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+	
+		<script>
+			let leftOffset = 0;
+			let topOffset = 0;
+			let flag = 0; // 0 - начало координат, 1 - справа сверху, 2- справа снизу, 3 - слева снизу
+
+			let moveHeading = function (){
+
+				if(flag == 0){
+					$('#heading').offset({ left: leftOffset});
+					$('#heading').offset({ top: topOffset});
+					leftOffset++;
+						if(leftOffset == 100){
+						flag = 1;
+						}
+				}
+				else if (flag == 1){
+					$('#heading').offset({ left: leftOffset});
+					$('#heading').offset({ top: topOffset});
+					topOffset++;
+					if(topOffset == 100){
+						flag = 2;
+						}
+				}
+				else if (flag == 2){
+					$('#heading').offset({ left: leftOffset});
+					$('#heading').offset({ top: topOffset});
+					leftOffset--;
+					if(leftOffset == 0){
+						flag = 3;
+						}
+				}
+				else if (flag == 3){
+					$('#heading').offset({ left: leftOffset});
+					$('#heading').offset({ top: topOffset});
+					topOffset--;
+					if(topOffset == 0){
+						flag = 0;
+						}
+				}
+
+			};
+
+			setInterval(moveHeading, 15);
+
+		</script>
+	</body>
+</html>
