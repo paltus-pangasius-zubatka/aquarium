@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html> <!-- lang="ru"> -->
+ 	<head>
+  		<title>Car Race</title>
+  		<meta charset="utf-8">
+ 	</head>
+	<body>
+		<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+		<script>
+
+// генерируем случайное число от 0 до 20
+let getRandomNumber = function(){
+			return Math.floor(Math.random() * 20);
+		};
+
+// создаем конструктор Car - это "шаблон" для объектов, функция для создания объектов 
+let Car = function(x, y, speed){    // конструктор принимает занчения координат и скорость
+	this.x = x;						// this - позволяет абстрагировать значение
+	this.y = y;						// при создании каждый объект получит своё значение переменных. 
+	this.speed = speed;				// Например: если передали при создании объекта (0, 10, 50),
+									// то фактически объект будет {x: 0, y: 10, speed: 50) 
+
+	this.draw = function (){         // рисуем машину. Картинка взята на сайте издательства No Starch
+	let carHtml = '<img src="http://nostarch.com/images/car.png">'; // присвоили переменной carHtml картинку
+	this.carElement = $(carHtml);									// создали абстрактную переменную carElement, присвоили ей jQuery переменную из carHtml;
+	this.carElement.css({											// метод css из библиотеки jQuery - позволяет выводить графику на экран в заданных
+		position: 'absolute',										// координатах. Absolute - указывает, что начало координат в левом верхнем углу страницы
+		left: this.x,
+		top: this.y
+	});
+	$("body").append(this.carElement);	// добавляем carElement на страницу
+	}									// между тегами body
+};
+
+// добавляем метод - сдвиг машины на случайное количество символов
+// метод можно сразу прописать в основной конструкто Car аналогично
+// методу draw
+// здесь это сделано, чтобы показать возможность JS.
+Car.prototype.moveRight = function() {        // prototype - указывает на то, что мы добавляем
+	this.x += this.speed + getRandomNumber(); // метод к уже существующему конструктору
+	this.carElement.css({
+		left: this.x,
+		top: this.y
+	});
+};
+
+// создаём два объекта - две машины. volga и niva
+let volga = new Car( 0, 20, 0); //координаты 0, 20; начальная скорость 0
+let niva = new Car( 0, 200, 0); //координаты 0, 200; начальная скорость 0
+
+// рисуем обе машины, методом draw
+volga.draw(); 
+niva.draw();
+
+// основная функция - двигает машины до достижения ими края экрана
+let move = function(){ // называется move
+
+volga.moveRight(); // вызываем метод moveRight для первой машины - volga
+niva.moveRight(); // вызываем метод moveRight для второй машины - niva
+
+// проверяем, если координаты одной из машин достигли края экрана -
+// сообщаем об этом пользователю
+	if(volga.x >= window.innerWidth - 128){  // -128 - для того, чтобы 
+		alert('Верхний победил!');			 // машина шириной 128 не выехала
+		clearInterval(intervalID);			 // за пределы экрана
+	}
+	else if(niva.x >= window.innerWidth - 128){  // clearInterval - эта функция
+		alert('Нижний победил!');				 // прекращает действие setInterval,
+		clearInterval(intervalID);				 // принимает параметр - ID, который
+	};											 // возвращает setInterval
+};
+
+// функция setInterval запускает основную функцию каждые 30 миллисекунд
+let intervalID = setInterval(move, 30); 
+			
+		</script>
+	</body>
+</html>
