@@ -1,0 +1,180 @@
+<html>
+	<head>
+	<title> Hangman with canvas. v.1.0 </title>
+		<script src="https://code.jquery.com/jquery-1.2.6.js" type="text/javascript"></script>
+		<script src="https://paltus-pangasius-zubatka.000webhostapp.com/jquery.alerts.js" type="text/javascript"></script>
+		<link href="https://paltus-pangasius-zubatka.000webhostapp.com/jquery.alerts.css" rel="stylesheet" type="text/css" media="screen" />
+	</head>
+<body>
+		
+<h1> Hangman with canvas </h1>
+<div id="message">---</div>		
+<div id="message-help">---</div>		
+
+<canvas id="canvas" width="400" height="400"></canvas>
+
+<script>
+	let canvas = document.getElementById("canvas");  // инициализация canvas (выше в DIV указываем размер холста)
+	let ctx = canvas.getContext("2d");				 // передача контекста - используем 2d
+
+
+//----------------canvas-------for_hangman---------------------
+
+ctx.lineWidth = 1; // задаем толщину линии
+
+let x = 100; 	// начальные координаты виселицы
+let y = 100;
+
+function HangmanCircle(offsetX, offsetY){   // конструктор, принимает занчения смещения от исходных координат
+	this.X = offsetX;						// рисует кружок
+	this.Y = offsetY;
+	this.draw = function(){
+		ctx.beginPath();
+		ctx.arc(x + this.X, y + this.Y , 5, 0, Math.PI * 2, false);
+		ctx.stroke();			
+	};
+};
+
+function HangmanLine(fromX, fromY, toX, toY){  // конструктор, принимает координаты начала линии(fromX, fromY), конца линии (toX, toY)
+			this.fromX = fromX;				   // рисует линии
+			this.fromY = fromY;
+			this.toX = toX;
+			this.toY = toY;
+			this.draw = function(){
+				ctx.beginPath();
+				ctx.moveTo(x + this.fromX, y + this.fromY);
+				ctx.lineTo(x + this.toX, y + this.toY); 
+				ctx.stroke();
+			};
+};
+
+let ground = new HangmanLine(0 , 60, 20, 60);  // создание набора отдельных линий в виде объектов
+let pillar = new HangmanLine(10, 60, 10, 0);
+let crossbar = new HangmanLine(5, 0, 45, 0);
+let brace = new HangmanLine(10, 10, 20, 0);
+let rope = new HangmanLine(40, 0, 40, 10);
+
+let head = new HangmanCircle(40, 15);		   // создание круга в виде объекта (голова)
+
+let body = new HangmanLine(40, 20, 40, 35);
+let leftHand = new HangmanLine(30, 30, 40, 20);
+let rightHand = new HangmanLine(40, 20, 50, 30);
+let leftLeg = new HangmanLine(35, 50, 40, 35);
+let rightLeg = new HangmanLine(40, 35, 45, 50);
+
+
+let arrPicture = [ rightLeg, leftLeg, rightHand, leftHand, body, head, rope, brace, crossbar, pillar, ground ];  // массив объектов частей тела
+
+//----------------canvas-------for_hangman---------------------
+
+
+
+//----------------main-code-------for_hangman---------------------
+
+let wordsForGame = ['cat', 'dog', 'mouse', 'horse', 'lama', 'casper'];  // слова для угадывания
+
+// случайным образом выбираем слово и переводим в верхний регистр (для красоты)
+let sourceWordString = wordsForGame[ Math.floor(Math.random() * (wordsForGame.length - 1)) ].toUpperCase(); 
+
+let userInput; 				// строка введенная пользователем
+let sourceWord = [];		// массив с исходным словом
+let resultWord = [];		// массив с конечным словом
+let controlString = '';		// строка для проверки
+let tryCounter = 10;  		// количество попыток
+let guessedLetterIndex;
+
+//заполняет исходный массив sourceWord символами строки sourceWordString
+for (var i = 0; i < sourceWordString.length; i++) {
+	sourceWord[i] = sourceWordString[i];
+}
+
+//заполняет итоговый массив resultWord символами "_"
+for (var i = 0; i < sourceWordString.length; i++) {
+	resultWord[i] = '_';
+}
+
+// выводим исходную информацию для игрока
+$("#message").text( 'THE GAME STARTS! GUESS AN ANIMAL of: ' + sourceWordString.length + ' lettes!' );			
+arrPicture[tryCounter].draw(); // рисуем основание виселицы
+
+let promptWindow = function(){ // основная функция ввода
+				
+	$.alerts.horizontalOffset = -1000; 		// настройки для положения окна ввода
+	$.alerts.verticalOffset = -100;	   		// для функции jPrompt из плагина
+	$.alerts.repositionOnResize = false;    // jquery.alerts.js
+
+	jPrompt('Type a letter:', '?', 'paltus-pangasius-zubatka', function(userInput) { // обращаемся к функции внешней библиотеки, jPrompt
+
+
+		if( userInput && tryCounter>0 && controlString != sourceWord ) { 		// проверяем введена ли буква, tryCounter попыток угадать слово
+																				// в условии все условия продолжения ввода
+			  		
+			userInput = userInput.toUpperCase();	// переводим введенную букву в верхний регистр (для красоты)
+
+			$('#message').text('You entered userInput:  ' + userInput);  // выводим информацию о введенной букве в div с id="message"
+
+				//вставляем букву в результирующий массив resultWord
+				for (let j = 0; j < sourceWord.length; j++) {
+					if (sourceWord[j] == userInput){
+						resultWord[j] = userInput;
+						// guessedLetterIndex = 1;
+						tryCounter++;   // добавляем к счётчику попыток 1, чтобы угаданная буква не уменьшила кол-во попыток
+					};
+				};
+
+				//проверям угадано ли слово
+				controlString = resultWord.join();
+				$("#message").text( 'Now the word looks like:  ' + resultWord.join(' ') );
+				//$('#array-contents').text('Array contents:  ' + resultWord);
+
+
+				arrPicture[tryCounter-1].draw(); // рисуем часть виселицы или человечка, -1 потому что линия земли уже нарисована
+
+
+				tryCounter--;  // уменьшаем счётчик попыток
+
+						if( controlString == sourceWord) {   // если контрольная строка равна исходному слову
+							exitGameWin();					 // завершаем игру, запускаем функцию exitGameWin
+						} 
+						else if (tryCounter == 0) {			 // если счётчик попыток = 0, `
+            				exitGameLoose();            	 // завершаем игру, запускаем функцию exitGameLoose
+						}
+						else{							
+						$('#message-help').text('Attempts left:  ' + tryCounter); // иначе пишем количество оставшихся попыток
+						};
+
+				promptWindow();  // вызываем функцию ввода (саму себя), пока не угадаем слово
+
+				}
+				else {
+				exitCancelled(); // если нажали Cancel - выходим из программы
+				};
+		});
+	};
+
+	promptWindow();  // запускаем основную функцию, она же функция ввода
+
+
+	let exitGameLoose = function(){
+		$('#message-help').text('Attempts left:  0');  // поздравляем с поражением
+		$("#message").text('GAME OVER');
+	};
+
+	let exitGameWin = function(){
+		$("#message").text( 'WELL DONE! YOU WIN!' );  // поздравляем с победой
+	};
+	
+	let exitCancelled = function(){
+		$("#message").text('BYE!');
+		// for(k = 0; k < arrPicture.length; k++){   // рисуем виселицу целиком
+		// 	arrPicture[k].draw();
+		// };
+
+};
+
+//----------------main-code-------for_hangman---------------------
+
+</script>
+
+</body>
+</html>
